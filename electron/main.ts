@@ -56,12 +56,12 @@ ipcMain.handle("getLockFiles", async (_, dir: string) => {
     ? `(Get-ChildItem ${dir} | ?{$_.PsIsContainer -eq $false} | ?{$_.IsReadOnly -eq $true}).FullName`
     : `find ${dir} -type f -flags +uchg`;
   const stdout = await execCommand(command, shell);
-  const files = stdout.split("\n").filter((v) => !!v);
+  const files = stdout.replace("\r\n", "\n").split("\n").filter((v) => !!v);
   return files;
 });
 
 ipcMain.handle("transfer", (_, src: string, dest: string) => {
-  return copyFile(src, isWin ? dest : path.join(dest, path.basename(src)));
+  return copyFile(src, path.join(dest, path.basename(src)));
 });
 
 function createWindow() {
